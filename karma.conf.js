@@ -1,89 +1,111 @@
 'use strict';
 
-// Karma configuration
+var path = require('path');
+var conf = require('./gulp/conf');
+
+var _ = require('lodash');
+var wiredep = require('wiredep');
+
+var pathSrcHtml = [
+  path.join(conf.paths.src, '/**/*.html')
+];
+
+function listFiles() {
+  var wiredepOptions = _.extend({}, conf.wiredep, {
+    dependencies: true,
+    devDependencies: true
+  });
+
+  var patterns = wiredep(wiredepOptions).js
+    .concat([
+      path.join(conf.paths.src, '/app/**/*.module.js'),
+      path.join(conf.paths.src, '/app/**/*.js'),
+      path.join(conf.paths.src, '/**/*.spec.js'),
+      path.join(conf.paths.src, '/**/*.mock.js'),
+    ])
+    .concat(pathSrcHtml);
+
+  var files = patterns.map(function(pattern) {
+    return {
+      pattern: pattern
+    };
+  });
+  files.push({
+    pattern: path.join(conf.paths.src, '/assets/**/*'),
+    included: false,
+    served: true,
+    watched: false
+  });
+  return files;
+}
+
 module.exports = function(config) {
-  var basePath = '.';
 
-  config.set({
+  var configuration = {
+    files: listFiles(),
 
-    // base path, that will be used to resolve files and exclude
-    basePath: basePath,
+    singleRun: true,
 
-    // frameworks to use
-    frameworks: ['jasmine', 'phantomjs-shim'],
-
-    // list of files to exclude
-    exclude: [],
-
-    // test results reporter to use
-    // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-    reporters: ['progress', 'coverage', 'junit'],
-
-    junitReporter: {
-      outputDir: 'tests/results/public/junit/'
-    },
-
-    // coverage
-    preprocessors: {
-      // source files that you want to generate coverage for
-      // do not include tests or libraries
-      // (these files will be instrumented by Istanbul)
-      'packages/**/public/controllers/**/*.js': ['coverage'],
-      'packages/**/public/services/**/*.js': ['coverage'],
-      'packages/**/public/directives/**/*.js': ['coverage'],
-
-      'packages/**/public/**/*.html': ['ng-html2js']
-    },
-
-    coverageReporter: {
-      type: 'html',
-      dir: 'tests/results/coverage/'
-    },
-
-    ngHtml2JsPreprocessor: {
-      cacheIdFromPath: function(path){
-        var cacheId = path;
-
-        //Strip packages/custom/ and public/ to match the pattern of URL that mean.io uses
-        cacheId = cacheId.replace('packages/custom/', '');
-        cacheId = cacheId.replace('public/', '');
-
-        return cacheId;
-      }
-    },
-
-    // web server port
-    port: 9876,
-    // Look for server on port 3001 (invoked by mocha) - via @brownman
-    proxies: {
-      '/': 'http://localhost:3001/'
-    },
-
-    // enable / disable colors in the output (reporters and logs)
-    colors: true,
-
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
-
-    // enable / disable watching file and executing tests whenever any file changes
     autoWatch: false,
 
-    // Start these browsers, currently available:
-    // - Chrome
-    // - ChromeCanary
-    // - Firefox
-    // - Opera
-    // - Safari (only Mac)
-    // - PhantomJS
-    // - IE (only Windows)
-    browsers: ['PhantomJS'],
+    ngHtml2JsPreprocessor: {
+      stripPrefix: conf.paths.src + '/',
+      moduleName: 'ctrlNewnodb'
+    },
 
-    // If browser does not capture in given timeout [ms], kill it
-    captureTimeout: 60000,
+    logLevel: 'WARN',
 
-    // Continuous Integration mode
-    // if true, it capture browsers, run tests and exit
-    singleRun: true
+    frameworks: ['phantomjs-shim', 'jasmine', 'angular-filesort'],
+
+    angularFilesort: {
+      whitelist: [path.join(conf.paths.src, '/**/!(*.html|*.spec|*.mock).js')]
+    },
+
+    browsers : ['PhantomJS'],
+
+    plugins : [
+      'karma-phantomjs-launcher',
+      'karma-angular-filesort',
+      'karma-phantomjs-shim',
+      'karma-coverage',
+      'karma-jasmine',
+      'karma-ng-html2js-preprocessor'
+    ],
+
+    coverageReporter: {
+      type : 'html',
+      dir : 'coverage/'
+    },
+
+    reporters: ['progress'],
+
+    proxies: {
+      '/assets/': path.join('/base/', conf.paths.src, '/assets/')
+    }
+  };
+
+  // This is the default preprocessors configuration for a usage with Karma cli
+  // The coverage preprocessor is added in gulp/unit-test.js only for single tests
+  // It was not possible to do it there because karma doesn't let us now if we are
+  // running a single test or not
+  configuration.preprocessors = {};
+  pathSrcHtml.forEach(function(path) {
+    configuration.preprocessors[path] = ['ng-html2js'];
   });
+
+  // This block is needed to execute Chrome on Travis
+  // If you ever plan to use Chrome and Travis, you can keep it
+  // If not, you can safely remove it
+  // https://github.com/karma-runner/karma/issues/1144#issuecomment-53633076
+  if(configuration.browsers[0] === 'Chrome' && process.env.TRAVIS) {
+    configuration.customLaunchers = {
+      'chrome-travis-ci': {
+        base: 'Chrome',
+        flags: ['--no-sandbox']
+      }
+    };
+    configuration.browsers = ['chrome-travis-ci'];
+  }
+
+  config.set(configuration);
 };
