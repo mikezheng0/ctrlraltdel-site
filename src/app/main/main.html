@@ -5,29 +5,68 @@
       <acme-navbar creation-date="main.creationDate"></acme-navbar>
     </header>
 
-    <section class="jumbotron">
-      <h1>'Allo, 'Allo!</h1>
-      <p class="lead">
-        <img src="assets/images/yeoman.png" alt="I'm Yeoman"><br>
-        Always a pleasure scaffolding your apps.
-      </p>
-      <md-button class="md-raised animated infinite" ng-class="main.classAnimation" ng-click="main.showToastr()">Splendid Toastr</md-button>
-      <p>
-        With ♥ thanks to the contributions of<acme-malarkey extra-values="['Yeoman', 'Gulp', 'Angular']"></acme-malarkey>
-      </p>
-    </section>
+    <md-grid-list md-cols-xs="1" md-cols="3" md-row-height="200px" md-row-height-xs="3:1" md-gutter="0px">
+      <md-grid-tile class="main-tile" style="background:url('assets/images/ds3.jpg') center no-repeat;background-size: cover"
+                    md-rowspan="2" md-colspan="2" md-colspan-xs="1" >
+        <md-grid-tile-footer>
+          <h3>Is this the best souls game?</h3>
+        </md-grid-tile-footer>
+        <a class="main-overlay" href="">
+          <p></p>
+        </a>
+      </md-grid-tile>
+      <md-grid-tile class="second-tile" style="background:url('assets/images/vr.jpg') center no-repeat;background-size: cover"
+                    md-rowspan="1" md-colspan="1" md-colspan-xs="1">
+        <md-grid-tile-footer>
+          <h3>VR causes AIDS????</h3>
+        </md-grid-tile-footer>
+        <a class="main-overlay" href="">
+          <p></p>
+        </a>
+      </md-grid-tile>
+      <md-grid-tile class="third-tile" style="background:url('assets/images/whispers.jpg') center no-repeat;background-size: cover"
+                    md-rowspan="1" md-colspan="1" md-colspan-xs="1">
+        <a class="main-overlay" href="">
+          <p></p>
+        </a>
+        <md-grid-tile-footer>
+          <h3>Hearthstone MMO</h3>
+        </md-grid-tile-footer>
+      </md-grid-tile>
+    </md-grid-list>
+    <div class="two-split" layout="row" layout-sm="column">
+      <div flex="70" class="shows-list" layout-align="center">
+        <md-card ng-repeat="i in [5,4,3,2,1]">
+          <md-card-title>
+            <md-card-title-text>
+              <span class="md-headline">Podcast Number {{i}}</span>
+              <span class="md-subhead">In this Episode we talk about VR again</span>
+            </md-card-title-text>
+            <md-card-title-media>
+              <div class="md-media-sm card-media" style="background:url('assets/images/vr.jpg') center no-repeat;background-size: cover">
 
-    <div class="techs" layout-align="center">
-      <md-card ng-repeat="awesomeThing in main.awesomeThings | orderBy:'rank'">
-        <md-card-content>
-          <img class="pull-right" ng-src="assets/images/{{ awesomeThing.logo }}" alt="{{ awesomeThing.title }}">
-          <h3 class="md-title">{{ awesomeThing.title }}</h3>
-          <p>{{ awesomeThing.description }}</p>
-        </md-card-content>
-        <div class="md-action-buttons">
-          <md-button ng-href="{{ awesomeThing.url }}">Website</md-button>
-        </div>
-      </md-card>
+              </div>
+            </md-card-title-media>
+          </md-card-title>
+          <md-card-actions layout="row" layout-align="end center">
+            <md-button>Click for More</md-button>
+          </md-card-actions>
+        </md-card>
+      </div>
+      <div flex="30">
+        <md-list class="upcoming-list">
+          <md-subheader class="md-no-sticky">Upcoming Shows</md-subheader>
+          <md-list-item class="md-3-line" ng-repeat="1 in [1,2,3]">
+            <div class="md-list-item-text" layout="column">
+              <h3>Sat Apr. 7th, 2018</h3>
+              <h4>New Podcast</h4>
+              <p>Exciting new episode of our podcast</p>
+            </div>
+          </md-list-item>
+          <md-divider ></md-divider>
+        </md-list>
+        <h1></h1>
+      </div>
     </div>
   </md-content>
 
